@@ -6,31 +6,41 @@ import type { Message } from '../core/types';
 const MessagesContainer = styled.div`
   flex: 1;
   overflow-y: auto;
-  padding: 16px;
+  padding: 24px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
+  background: white;
 `;
 
 const MessageBubble = styled.div<{ role: 'user' | 'assistant' }>`
-  max-width: 80%;
-  padding: 12px 16px;
-  border-radius: 18px;
+  max-width: 75%;
+  padding: 16px 20px;
+  border-radius: 20px;
   word-wrap: break-word;
+  line-height: 1.5;
+  font-size: 15px;
+  text-align: left;
   align-self: ${props => props.role === 'user' ? 'flex-end' : 'flex-start'};
-  background: ${props => props.role === 'user' ? '#007bff' : '#f1f3f5'};
-  color: ${props => props.role === 'user' ? 'white' : '#212529'};
+  background: ${props => props.role === 'user' ? '#1f2937' : '#f3f4f6'};
+  color: ${props => props.role === 'user' ? 'white' : '#1f2937'};
   position: relative;
+  box-shadow: ${props => props.role === 'user' ? '0 2px 8px rgba(0, 0, 0, 0.1)' : '0 1px 3px rgba(0, 0, 0, 0.05)'};
+  margin: ${props => props.role === 'user' ? '0 0 0 auto' : '0 auto 0 0'};
+  
+  /* More specific border radius for speech bubble effect */
+  border-bottom-right-radius: ${props => props.role === 'user' ? '6px' : '20px'};
+  border-bottom-left-radius: ${props => props.role === 'assistant' ? '6px' : '20px'};
 `;
 
 const MessageStatus = styled.div<{ status?: string }>`
   font-size: 11px;
-  margin-top: 4px;
-  opacity: 0.7;
+  margin-top: 6px;
+  opacity: 0.6;
   color: ${props => {
     switch (props.status) {
-      case 'error': return '#dc3545';
-      case 'pending': return '#ffc107';
+      case 'error': return '#ef4444';
+      case 'pending': return '#f59e0b';
       default: return 'inherit';
     }
   }};
@@ -42,25 +52,42 @@ const EmptyState = styled.div`
   align-items: center;
   justify-content: center;
   flex: 1;
-  color: #6c757d;
+  color: #9ca3af;
   text-align: center;
-  padding: 32px 16px;
+  padding: 48px 24px;
+`;
+
+const EmptyIcon = styled.div`
+  font-size: 48px;
+  margin-bottom: 16px;
+  opacity: 0.8;
+`;
+
+const EmptyText = styled.p`
+  font-size: 16px;
+  margin: 0;
+  font-weight: 500;
 `;
 
 const LoadingIndicator = styled.div`
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 12px 16px;
-  color: #6c757d;
+  gap: 12px;
+  padding: 16px 20px;
+  color: #6b7280;
   font-size: 14px;
+  align-self: flex-start;
+  background: #f3f4f6;
+  border-radius: 20px;
+  border-bottom-left-radius: 6px;
+  margin: 0 auto 0 0;
   
   &::after {
     content: '';
     width: 16px;
     height: 16px;
-    border: 2px solid #dee2e6;
-    border-top-color: #007bff;
+    border: 2px solid #e5e7eb;
+    border-top-color: #3b82f6;
     border-radius: 50%;
     animation: spin 1s linear infinite;
   }
@@ -104,8 +131,8 @@ export const MessageList: React.FC = () => {
     return (
       <MessagesContainer>
         <EmptyState>
-          <div>👋</div>
-          <p>Welcome! How can I help you today?</p>
+          <EmptyIcon>👋</EmptyIcon>
+          <EmptyText>Welcome! How can I help you today?</EmptyText>
         </EmptyState>
       </MessagesContainer>
     );

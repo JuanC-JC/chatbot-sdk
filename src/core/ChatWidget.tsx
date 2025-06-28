@@ -7,11 +7,11 @@ import type { ChatConfig } from './types';
 
 const WidgetContainer = styled.div<{ isVisible: boolean; config: ChatConfig }>`
   position: fixed;
-  width: 380px;
-  height: 500px;
+  width: 400px;
+  height: 600px;
   background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
   display: flex;
   flex-direction: column;
   z-index: 1000;
@@ -131,32 +131,36 @@ const TriggerContent = styled.div`
 `;
 
 const Header = styled.div<{ primaryColor?: string }>`
-  background: ${props => props.primaryColor || '#007bff'};
-  color: white;
-  padding: 16px 20px;
-  border-radius: 12px 12px 0 0;
+  background: #f8f9fa;
+  color: #1f2937;
+  padding: 20px 24px;
+  border-radius: 16px 16px 0 0;
   font-weight: 600;
-  font-size: 16px;
+  font-size: 18px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border-bottom: 1px solid #e9ecef;
 `;
 
 const CloseButton = styled.button`
   background: none;
   border: none;
-  color: white;
+  color: #6b7280;
   cursor: pointer;
-  font-size: 18px;
-  padding: 0;
-  width: 24px;
-  height: 24px;
+  font-size: 20px;
+  padding: 4px;
+  width: 28px;
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 6px;
+  transition: all 0.2s ease;
   
   &:hover {
-    opacity: 0.8;
+    background: #e5e7eb;
+    color: #374151;
   }
 `;
 
