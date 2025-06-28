@@ -20,6 +20,7 @@ export interface ChatConfig {
   triggerText?: string;
   triggerColor?: string;
   triggerSize?: number;
+  closeIcon?: string;
 }
 
 export interface ChatSDKInstance {

@@ -7,8 +7,6 @@ import type { ChatConfig } from './types';
 
 const WidgetContainer = styled.div<{ isVisible: boolean; config: ChatConfig }>`
   position: fixed;
-  bottom: 20px;
-  right: 20px;
   width: 380px;
   height: 500px;
   background: white;
@@ -18,18 +16,44 @@ const WidgetContainer = styled.div<{ isVisible: boolean; config: ChatConfig }>`
   flex-direction: column;
   z-index: 1000;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-  transform: ${props => props.isVisible ? 'translateY(0)' : 'translateY(100%)'};
+  transform: ${props => {
+    if (props.isVisible) return 'translateY(0)';
+
+    const position = props.config.position || 'bottom-right';
+    const [vertical] = position.split('-');
+
+    // Animate from top when positioned at top, from bottom when positioned at bottom
+    return vertical === 'top' ? 'translateY(-100%)' : 'translateY(100%)';
+  }};
   opacity: ${props => props.isVisible ? 1 : 0};
   transition: all 0.3s ease-in-out;
+  pointer-events: ${props => props.isVisible ? 'auto' : 'none'};
 
   ${props => {
     const position = props.config.position || 'bottom-right';
     const [vertical, horizontal] = position.split('-');
+    const triggerSize = props.config.triggerSize || 60;
+    const offset = 20;
+    const gap = 10; // Gap between button and chat widget
 
-    return `
-      ${vertical}: 20px;
-      ${horizontal}: 20px;
-    `;
+    // Position the chat widget relative to the trigger button
+    let styles = '';
+
+    // Handle vertical positioning
+    if (vertical === 'bottom') {
+      styles += `bottom: ${offset + triggerSize + gap}px;`;
+    } else if (vertical === 'top') {
+      styles += `top: ${offset + triggerSize + gap}px;`;
+    }
+
+    // Handle horizontal positioning 
+    if (horizontal === 'right') {
+      styles += `right: ${offset}px;`;
+    } else if (horizontal === 'left') {
+      styles += `left: ${offset}px;`;
+    }
+
+    return styles;
   }}
 `;
 
@@ -40,13 +64,14 @@ const TriggerButton = styled.button<{ config: ChatConfig; isVisible: boolean }>`
   border-radius: 50%;
   background: ${props => props.config.triggerColor || props.config.primaryColor || '#007bff'};
   border: none;
+  outline: none;
   color: white;
   cursor: pointer;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  display: ${props => props.isVisible ? 'none' : 'flex'};
+  display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 999;
+  z-index: 1001;
   font-size: ${props => (props.config.triggerSize || 60) * 0.4}px;
   font-weight: 600;
   transition: all 0.3s ease-in-out;
@@ -58,6 +83,15 @@ const TriggerButton = styled.button<{ config: ChatConfig; isVisible: boolean }>`
 
   &:active {
     transform: scale(0.95);
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  &:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.5);
+    outline-offset: 2px;
   }
 
   ${props => {
@@ -78,7 +112,22 @@ const TriggerContent = styled.div`
   justify-content: center;
   gap: 4px;
   white-space: nowrap;
-  overflow: hidden;
+  width: 100%;
+  height: 100%;
+
+  span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+  }
+
+  img, svg {
+    max-width: 70%;
+    max-height: 70%;
+    object-fit: contain;
+    flex-shrink: 0;
+  }
 `;
 
 const Header = styled.div<{ primaryColor?: string }>`
@@ -130,12 +179,25 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ config }) => {
   };
 
   const handleTriggerClick = () => {
-    setVisible(true);
+    setVisible(!isVisible);
   };
 
   const shouldShowTrigger = config.showTrigger !== false; // Default to true
-  const triggerIcon = config.triggerIcon || '💬';
-  const triggerText = config.triggerText || '';
+  
+  // Determine the icon based on visibility state
+  const getButtonContent = () => {
+    if (isVisible) {
+      // Show close or collapse icon when chat is open
+      return config.closeIcon || '↓'; // Down arrow or X
+    } else {
+      // Show open icon when chat is closed
+      return config.triggerIcon || '💬';
+    }
+  };
+
+  const getButtonTitle = () => {
+    return isVisible ? 'Close chat' : 'Open chat';
+  };
 
   return (
     <>
@@ -144,12 +206,12 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ config }) => {
           config={config}
           isVisible={isVisible}
           onClick={handleTriggerClick}
-          aria-label="Open chat"
-          title="Chat with us"
+          aria-label={getButtonTitle()}
+          title={getButtonTitle()}
         >
           <TriggerContent>
-            {triggerIcon && <span>{triggerIcon}</span>}
-            {triggerText && <span>{triggerText}</span>}
+            <span>{getButtonContent()}</span>
+            {!isVisible && config.triggerText && <span>{config.triggerText}</span>}
           </TriggerContent>
         </TriggerButton>
       )}
