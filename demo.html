@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat SDK Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 2.5rem;
+        }
+        
+        .demo-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s ease;
+        }
+        
+        button:hover {
+            background: #0056b3;
+        }
+        
+        button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        
+        .log {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 6px;
+            padding: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+        }
+        
+        #chat-container {
+            position: relative;
+            min-height: 100px;
+        }
+        
+        .config-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .config-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        label {
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        input, select {
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🤖 Chat SDK Demo</h1>
+        
+        <div class="demo-section">
+            <h3>Configuration</h3>
+            <div class="config-section">
+                <div class="config-group">
+                    <label for="primaryColor">Primary Color:</label>
+                    <input type="color" id="primaryColor" value="#007bff">
+                </div>
+                <div class="config-group">
+                    <label for="position">Position:</label>
+                    <select id="position">
+                        <option value="bottom-right">Bottom Right</option>
+                        <option value="bottom-left">Bottom Left</option>
+                        <option value="top-right">Top Right</option>
+                        <option value="top-left">Top Left</option>
+                    </select>
+                </div>
+                <div class="config-group">
+                    <label for="placeholder">Placeholder:</label>
+                    <input type="text" id="placeholder" value="Type your message...">
+                </div>
+            </div>
+        </div>
+        
+        <div class="demo-section">
+            <h3>Controls</h3>
+            <div class="controls">
+                <button onclick="initializeChat()">Initialize Chat</button>
+                <button onclick="destroyChat()">Destroy Chat</button>
+                <button onclick="showChat()">Show</button>
+                <button onclick="hideChat()">Hide</button>
+                <button onclick="toggleChat()">Toggle</button>
+                <button onclick="sendTestMessage()">Send Test Message</button>
+                <button onclick="clearLog()">Clear Log</button>
+            </div>
+        </div>
+        
+        <div class="demo-section">
+            <h3>Event Log</h3>
+            <div id="event-log" class="log">Waiting for events...\n</div>
+        </div>
+        
+        <!-- Chat container -->
+        <div id="chat-container"></div>
+    </div>
+
+    <!-- Load the SDK (this will be built) -->
+    <script src="./dist/chat-sdk.umd.cjs"></script>
+    
+    <script>
+        let chatInitialized = false;
+        
+        function log(message) {
+            const logElement = document.getElementById('event-log');
+            const timestamp = new Date().toLocaleTimeString();
+            logElement.textContent += `[${timestamp}] ${message}\n`;
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+        
+        function getConfig() {
+            return {
+                primaryColor: document.getElementById('primaryColor').value,
+                position: document.getElementById('position').value,
+                placeholder: document.getElementById('placeholder').value,
+            };
+        }
+        
+        function initializeChat() {
+            try {
+                const config = getConfig();
+                window.ChatSDK.init('chat-container', config);
+                chatInitialized = true;
+                log('✅ Chat initialized successfully');
+                
+                // Set up event listeners
+                window.ChatSDK.on('init', (data) => {
+                    log(`🎉 Chat init event: ${JSON.stringify(data)}`);
+                });
+                
+                window.ChatSDK.on('message:sent', (data) => {
+                    log(`📤 Message sent: ${JSON.stringify(data)}`);
+                });
+                
+                window.ChatSDK.on('message:received', (data) => {
+                    log(`📥 Message received: ${JSON.stringify(data)}`);
+                });
+                
+                window.ChatSDK.on('visibility:changed', (data) => {
+                    log(`👁️ Visibility changed: ${JSON.stringify(data)}`);
+                });
+                
+            } catch (error) {
+                log(`❌ Failed to initialize: ${error.message}`);
+            }
+        }
+        
+        function destroyChat() {
+            try {
+                window.ChatSDK.destroy();
+                chatInitialized = false;
+                log('🗑️ Chat destroyed');
+            } catch (error) {
+                log(`❌ Failed to destroy: ${error.message}`);
+            }
+        }
+        
+        function showChat() {
+            try {
+                window.ChatSDK.show();
+                log('👁️ Chat shown');
+            } catch (error) {
+                log(`❌ Failed to show: ${error.message}`);
+            }
+        }
+        
+        function hideChat() {
+            try {
+                window.ChatSDK.hide();
+                log('🙈 Chat hidden');
+            } catch (error) {
+                log(`❌ Failed to hide: ${error.message}`);
+            }
+        }
+        
+        function toggleChat() {
+            try {
+                window.ChatSDK.toggle();
+                log('🔄 Chat toggled');
+            } catch (error) {
+                log(`❌ Failed to toggle: ${error.message}`);
+            }
+        }
+        
+        function sendTestMessage() {
+            try {
+                const messages = [
+                    'Hello from the demo!',
+                    'This is a test message',
+                    'How are you doing?',
+                    '🚀 This SDK is working great!'
+                ];
+                const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+                window.ChatSDK.sendMessage(randomMessage);
+                log(`📨 Sent test message: "${randomMessage}"`);
+            } catch (error) {
+                log(`❌ Failed to send message: ${error.message}`);
+            }
+        }
+        
+        function clearLog() {
+            document.getElementById('event-log').textContent = '';
+            log('🧹 Log cleared');
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            log('📄 Page loaded, ready to initialize chat');
+            if (window.ChatSDK) {
+                log('✅ ChatSDK loaded successfully');
+            } else {
+                log('❌ ChatSDK not found! Make sure to build the project first.');
+            }
+        });
+    </script>
+</body>
+</html> 
