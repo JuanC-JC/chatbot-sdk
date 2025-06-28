@@ -17,7 +17,7 @@ const generateId = () => Math.random().toString(36).substring(2) + Date.now().to
 export const useChatStore = create<ChatStore>((set) => ({
   // State
   messages: [],
-  isVisible: true,
+  isVisible: false,
   isLoading: false,
   config: {},
 

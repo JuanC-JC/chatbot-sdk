@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat SDK Demo</title>
+    <title>Chat SDK Demo - Hybrid Trigger Approach</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -15,7 +15,7 @@
         }
         
         .container {
-            max-width: 800px;
+            max-width: 1000px;
             margin: 0 auto;
             padding: 40px 20px;
         }
@@ -100,21 +100,55 @@
             border: 1px solid #ddd;
             font-size: 14px;
         }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        input[type="checkbox"] {
+            width: auto;
+        }
+
+        .example-section {
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .custom-trigger-demo {
+            background: #28a745;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .custom-trigger-demo:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🤖 Chat SDK Demo</h1>
+        <h1>🤖 Chat SDK Demo - Hybrid Trigger</h1>
         
         <div class="demo-section">
-            <h3>Configuration</h3>
+            <h3>🎛️ Configuration</h3>
             <div class="config-section">
                 <div class="config-group">
                     <label for="primaryColor">Primary Color:</label>
                     <input type="color" id="primaryColor" value="#007bff">
                 </div>
                 <div class="config-group">
-                    <label for="position">Position:</label>
+                    <label for="position">Widget Position:</label>
                     <select id="position">
                         <option value="bottom-right">Bottom Right</option>
                         <option value="bottom-left">Bottom Left</option>
@@ -127,10 +161,45 @@
                     <input type="text" id="placeholder" value="Type your message...">
                 </div>
             </div>
+
+            <h4>🔘 Trigger Button Configuration</h4>
+            <div class="config-section">
+                <div class="config-group">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="showTrigger" checked>
+                        <label for="showTrigger">Show Built-in Trigger</label>
+                    </div>
+                </div>
+                <div class="config-group">
+                    <label for="triggerPosition">Trigger Position:</label>
+                    <select id="triggerPosition">
+                        <option value="bottom-right">Bottom Right</option>
+                        <option value="bottom-left">Bottom Left</option>
+                        <option value="top-right">Top Right</option>
+                        <option value="top-left">Top Left</option>
+                    </select>
+                </div>
+                <div class="config-group">
+                    <label for="triggerIcon">Trigger Icon:</label>
+                    <input type="text" id="triggerIcon" value="💬" placeholder="💬">
+                </div>
+                <div class="config-group">
+                    <label for="triggerText">Trigger Text (optional):</label>
+                    <input type="text" id="triggerText" value="" placeholder="Chat">
+                </div>
+                <div class="config-group">
+                    <label for="triggerColor">Trigger Color:</label>
+                    <input type="color" id="triggerColor" value="#007bff">
+                </div>
+                <div class="config-group">
+                    <label for="triggerSize">Trigger Size (px):</label>
+                    <input type="number" id="triggerSize" value="60" min="40" max="100">
+                </div>
+            </div>
         </div>
         
         <div class="demo-section">
-            <h3>Controls</h3>
+            <h3>🎮 Controls</h3>
             <div class="controls">
                 <button onclick="initializeChat()">Initialize Chat</button>
                 <button onclick="destroyChat()">Destroy Chat</button>
@@ -141,9 +210,55 @@
                 <button onclick="clearLog()">Clear Log</button>
             </div>
         </div>
+
+        <div class="demo-section">
+            <h3>📋 Examples</h3>
+            
+            <div class="example-section">
+                <h4>Example 1: Built-in Trigger Button (Default)</h4>
+                <p>Most common use case - SDK provides a floating action button</p>
+                <button onclick="initBuiltinTrigger()">Try Built-in Trigger</button>
+                <pre style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 4px; margin-top: 10px;">
+ChatSDK.init('chat-container', {
+  showTrigger: true,          // Default: true
+  triggerPosition: 'bottom-right',
+  triggerIcon: '💬',
+  triggerColor: '#007bff',
+  triggerSize: 60
+});
+                </pre>
+            </div>
+
+            <div class="example-section">
+                <h4>Example 2: Custom Trigger Button</h4>
+                <p>When you want complete control over the trigger design</p>
+                <button onclick="initCustomTrigger()">Try Custom Trigger</button>
+                <button class="custom-trigger-demo" onclick="window.ChatSDK && window.ChatSDK.toggle()">
+                    🗨️ Custom Chat Button
+                </button>
+                <pre style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 4px; margin-top: 10px;">
+ChatSDK.init('chat-container', {
+  showTrigger: false    // Disable built-in trigger
+});
+
+// Your custom button
+document.getElementById('my-trigger').onclick = () => {
+  ChatSDK.toggle();
+};
+                </pre>
+            </div>
+
+            <div class="example-section">
+                <h4>Example 3: Different Positions</h4>
+                <p>Showcase different positioning options</p>
+                <button onclick="initBottomLeft()">Bottom Left</button>
+                <button onclick="initTopRight()">Top Right</button>
+                <button onclick="initTopLeft()">Top Left</button>
+            </div>
+        </div>
         
         <div class="demo-section">
-            <h3>Event Log</h3>
+            <h3>📊 Event Log</h3>
             <div id="event-log" class="log">Waiting for events...\n</div>
         </div>
         
@@ -151,7 +266,7 @@
         <div id="chat-container"></div>
     </div>
 
-    <!-- Load the SDK (this will be built) -->
+    <!-- Load the SDK -->
     <script src="./dist/chat-sdk.umd.cjs"></script>
     
     <script>
@@ -169,7 +284,32 @@
                 primaryColor: document.getElementById('primaryColor').value,
                 position: document.getElementById('position').value,
                 placeholder: document.getElementById('placeholder').value,
+                showTrigger: document.getElementById('showTrigger').checked,
+                triggerPosition: document.getElementById('triggerPosition').value,
+                triggerIcon: document.getElementById('triggerIcon').value || '💬',
+                triggerText: document.getElementById('triggerText').value,
+                triggerColor: document.getElementById('triggerColor').value,
+                triggerSize: parseInt(document.getElementById('triggerSize').value)
             };
+        }
+        
+        function setupEventListeners() {
+            // Set up event listeners
+            window.ChatSDK.on('init', (data) => {
+                log(`🎉 Chat init event: ${JSON.stringify(data)}`);
+            });
+            
+            window.ChatSDK.on('message:sent', (data) => {
+                log(`📤 Message sent: ${JSON.stringify(data)}`);
+            });
+            
+            window.ChatSDK.on('message:received', (data) => {
+                log(`📥 Message received: ${JSON.stringify(data)}`);
+            });
+            
+            window.ChatSDK.on('visibility:changed', (data) => {
+                log(`👁️ Visibility changed: ${JSON.stringify(data)}`);
+            });
         }
         
         function initializeChat() {
@@ -177,25 +317,99 @@
                 const config = getConfig();
                 window.ChatSDK.init('chat-container', config);
                 chatInitialized = true;
-                log('✅ Chat initialized successfully');
-                
-                // Set up event listeners
-                window.ChatSDK.on('init', (data) => {
-                    log(`🎉 Chat init event: ${JSON.stringify(data)}`);
+                log(`✅ Chat initialized with config: ${JSON.stringify(config, null, 2)}`);
+                setupEventListeners();
+            } catch (error) {
+                log(`❌ Failed to initialize: ${error.message}`);
+            }
+        }
+
+        // Example initialization functions
+        function initBuiltinTrigger() {
+            try {
+                window.ChatSDK.destroy();
+                window.ChatSDK.init('chat-container', {
+                    showTrigger: true,
+                    triggerPosition: 'bottom-right',
+                    triggerIcon: '💬',
+                    triggerColor: '#007bff',
+                    triggerSize: 60,
+                    primaryColor: '#007bff'
                 });
-                
-                window.ChatSDK.on('message:sent', (data) => {
-                    log(`📤 Message sent: ${JSON.stringify(data)}`);
+                chatInitialized = true;
+                log('✅ Built-in trigger example initialized');
+                setupEventListeners();
+            } catch (error) {
+                log(`❌ Failed to initialize built-in trigger: ${error.message}`);
+            }
+        }
+
+        function initCustomTrigger() {
+            try {
+                window.ChatSDK.destroy();
+                window.ChatSDK.init('chat-container', {
+                    showTrigger: false,  // Disable built-in trigger
+                    primaryColor: '#28a745'
                 });
-                
-                window.ChatSDK.on('message:received', (data) => {
-                    log(`📥 Message received: ${JSON.stringify(data)}`);
+                chatInitialized = true;
+                log('✅ Custom trigger example initialized (use green button above)');
+                setupEventListeners();
+            } catch (error) {
+                log(`❌ Failed to initialize custom trigger: ${error.message}`);
+            }
+        }
+
+        function initBottomLeft() {
+            try {
+                window.ChatSDK.destroy();
+                window.ChatSDK.init('chat-container', {
+                    showTrigger: true,
+                    position: 'bottom-left',
+                    triggerPosition: 'bottom-left',
+                    triggerIcon: '🗨️',
+                    primaryColor: '#dc3545'
                 });
-                
-                window.ChatSDK.on('visibility:changed', (data) => {
-                    log(`👁️ Visibility changed: ${JSON.stringify(data)}`);
+                chatInitialized = true;
+                log('✅ Bottom-left example initialized');
+                setupEventListeners();
+            } catch (error) {
+                log(`❌ Failed to initialize: ${error.message}`);
+            }
+        }
+
+        function initTopRight() {
+            try {
+                window.ChatSDK.destroy();
+                window.ChatSDK.init('chat-container', {
+                    showTrigger: true,
+                    position: 'top-right',
+                    triggerPosition: 'top-right',
+                    triggerIcon: '💭',
+                    primaryColor: '#6f42c1'
                 });
-                
+                chatInitialized = true;
+                log('✅ Top-right example initialized');
+                setupEventListeners();
+            } catch (error) {
+                log(`❌ Failed to initialize: ${error.message}`);
+            }
+        }
+
+        function initTopLeft() {
+            try {
+                window.ChatSDK.destroy();
+                window.ChatSDK.init('chat-container', {
+                    showTrigger: true,
+                    position: 'top-left',
+                    triggerPosition: 'top-left',
+                    triggerIcon: '🤖',
+                    triggerText: 'Help',
+                    triggerSize: 80,
+                    primaryColor: '#20c997'
+                });
+                chatInitialized = true;
+                log('✅ Top-left with text example initialized');
+                setupEventListeners();
             } catch (error) {
                 log(`❌ Failed to initialize: ${error.message}`);
             }
@@ -244,7 +458,8 @@
                     'Hello from the demo!',
                     'This is a test message',
                     'How are you doing?',
-                    '🚀 This SDK is working great!'
+                    '🚀 This SDK is working great!',
+                    'Testing the new trigger button feature!'
                 ];
                 const randomMessage = messages[Math.floor(Math.random() * messages.length)];
                 window.ChatSDK.sendMessage(randomMessage);
@@ -261,9 +476,10 @@
         
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
-            log('📄 Page loaded, ready to initialize chat');
+            log('📄 Page loaded, ready to test hybrid trigger approach');
             if (window.ChatSDK) {
                 log('✅ ChatSDK loaded successfully');
+                log('💡 Try the example buttons to see different configurations');
             } else {
                 log('❌ ChatSDK not found! Make sure to build the project first.');
             }

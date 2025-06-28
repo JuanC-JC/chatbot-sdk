@@ -22,8 +22,11 @@ class ChatSDK implements ChatSDKInstance {
       // Clean up existing instance
       this.destroy();
 
-      // Store config
-      this.config = { ...config };
+      // Store config with defaults
+      this.config = { 
+        showTrigger: true, // Default to showing trigger
+        ...config 
+      };
 
       // Get container element
       this.container = createContainer(containerId);
@@ -34,6 +37,12 @@ class ChatSDK implements ChatSDKInstance {
 
       // Clear container
       removeAllChildren(this.container);
+
+      // Set initial visibility based on config
+      // If trigger is disabled, show the widget immediately
+      const initialVisibility = this.config.showTrigger === false;
+      useChatStore.getState().setVisible(initialVisibility);
+      useChatStore.getState().setConfig(this.config);
 
       // Create React root and render
       this.root = ReactDOM.createRoot(this.container);
@@ -144,6 +153,16 @@ class ChatSDK implements ChatSDKInstance {
     const newVisibility = !isVisible;
     setVisible(newVisibility);
     this.emit('visibility:changed', { visible: newVisibility });
+  }
+
+  // Get current configuration
+  getConfig(): ChatConfig {
+    return { ...this.config };
+  }
+
+  // Check if widget is currently visible
+  isVisible(): boolean {
+    return useChatStore.getState().isVisible;
   }
 
   // Private methods

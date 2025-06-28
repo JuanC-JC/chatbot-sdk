@@ -14,6 +14,12 @@ export interface ChatConfig {
   primaryColor?: string;
   maxHeight?: number;
   placeholder?: string;
+  showTrigger?: boolean;
+  triggerPosition?: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left';
+  triggerIcon?: string;
+  triggerText?: string;
+  triggerColor?: string;
+  triggerSize?: number;
 }
 
 export interface ChatSDKInstance {
@@ -22,6 +28,11 @@ export interface ChatSDKInstance {
   sendMessage(message: string): void;
   on(event: string, callback: EventCallback): void;
   off(event: string, callback: EventCallback): void;
+  show(): void;
+  hide(): void;
+  toggle(): void;
+  getConfig(): ChatConfig;
+  isVisible(): boolean;
 }
 
 export type EventCallback = (data?: unknown) => void;
