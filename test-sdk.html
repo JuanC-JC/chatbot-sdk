@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat SDK Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🤖 Chat SDK Test Page</h1>
+        <p>This page tests if your Chat SDK is working from the Netlify CDN.</p>
+        
+        <div id="status" class="status">
+            ⏳ Loading SDK...
+        </div>
+        
+        <h3>Test Controls:</h3>
+        <button onclick="testShow()">Show Chat</button>
+        <button onclick="testHide()">Hide Chat</button>
+        <button onclick="testToggle()">Toggle Chat</button>
+        <button onclick="testSendMessage()">Send Test Message</button>
+        
+        <h3>SDK URLs:</h3>
+        <ul>
+            <li><strong>UMD:</strong> <a href="https://lighthearted-blancmange-c208a4.netlify.app/dist/chat-sdk.umd.cjs" target="_blank">chat-sdk.umd.cjs</a></li>
+            <li><strong>ES Module:</strong> <a href="https://lighthearted-blancmange-c208a4.netlify.app/dist/chat-sdk.js" target="_blank">chat-sdk.js</a></li>
+            <li><strong>Source Map:</strong> <a href="https://lighthearted-blancmange-c208a4.netlify.app/dist/chat-sdk.umd.cjs.map" target="_blank">chat-sdk.umd.cjs.map</a></li>
+        </ul>
+
+        <!-- Chat container -->
+        <div id="chat-container"></div>
+    </div>
+
+    <!-- Load the Chat SDK from Netlify CDN -->
+    <script src="https://lighthearted-blancmange-c208a4.netlify.app/dist/chat-sdk.umd.cjs"></script>
+    
+    <script>
+        const statusDiv = document.getElementById('status');
+        
+        // Test if SDK loaded
+        if (typeof ChatSDK !== 'undefined') {
+            statusDiv.className = 'status success';
+            statusDiv.innerHTML = '✅ Chat SDK loaded successfully!';
+            
+            // Initialize the chat widget
+            try {
+                ChatSDK.init('chat-container', {
+                    showTrigger: true,
+                    triggerPosition: 'bottom-right',
+                    triggerIcon: '💬',
+                    triggerColor: '#007bff',
+                    primaryColor: '#007bff'
+                });
+                
+                // Listen for events
+                ChatSDK.on('init', (data) => {
+                    console.log('Chat SDK initialized:', data);
+                });
+                
+                ChatSDK.on('message:sent', (data) => {
+                    console.log('Message sent:', data);
+                });
+                
+                ChatSDK.on('visibility:changed', (data) => {
+                    console.log('Visibility changed:', data.visible);
+                });
+                
+                statusDiv.innerHTML += '<br>🚀 Chat widget initialized with trigger button!';
+                
+            } catch (error) {
+                statusDiv.className = 'status error';
+                statusDiv.innerHTML = '❌ Failed to initialize chat widget: ' + error.message;
+            }
+        } else {
+            statusDiv.className = 'status error';
+            statusDiv.innerHTML = '❌ Failed to load Chat SDK. Check the console for errors.';
+        }
+        
+        // Test functions
+        function testShow() {
+            if (typeof ChatSDK !== 'undefined') {
+                ChatSDK.show();
+                console.log('Chat shown');
+            }
+        }
+        
+        function testHide() {
+            if (typeof ChatSDK !== 'undefined') {
+                ChatSDK.hide();
+                console.log('Chat hidden');
+            }
+        }
+        
+        function testToggle() {
+            if (typeof ChatSDK !== 'undefined') {
+                ChatSDK.toggle();
+                console.log('Chat toggled');
+            }
+        }
+        
+        function testSendMessage() {
+            if (typeof ChatSDK !== 'undefined') {
+                ChatSDK.sendMessage('Hello! This is a test message from the SDK.');
+                console.log('Test message sent');
+            }
+        }
+    </script>
+</body>
+</html> 
