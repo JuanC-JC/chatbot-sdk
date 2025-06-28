@@ -1,0 +1,41 @@
+[build]
+  # Build command to run
+  command = "npm run build"
+  
+  # Directory to publish (the root directory since we need both the demo and dist files)
+  publish = "."
+  
+  # Node.js version to use
+  [build.environment]
+    NODE_VERSION = "18"
+
+# Headers for CORS and caching
+[[headers]]
+  for = "/dist/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, HEAD, OPTIONS"
+    Access-Control-Allow-Headers = "Content-Type"
+
+[[headers]]
+  for = "*.js"
+  [headers.values]
+    Content-Type = "application/javascript"
+
+[[headers]]
+  for = "*.cjs"
+  [headers.values]
+    Content-Type = "application/javascript"
+
+# Redirects for different file extensions
+[[redirects]]
+  from = "/dist/chat-sdk.umd.js"
+  to = "/dist/chat-sdk.umd.cjs"
+  status = 200
+
+# SPA fallback for demo
+[[redirects]]
+  from = "/demo/*"
+  to = "/index.html"
+  status = 200 
